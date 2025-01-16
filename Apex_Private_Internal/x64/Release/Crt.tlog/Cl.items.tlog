@@ -1,0 +1,16 @@
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\Custom.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\Custom.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\dllmain.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\dllmain.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui_demo.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui_demo.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui_draw.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui_draw.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui_impl_dx11.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui_impl_dx11.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui_impl_win32.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui_impl_win32.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui_tables.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui_tables.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\imgui\imgui_widgets.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\imgui_widgets.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\kiero\kiero.cpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\kiero.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\kiero\minhook\src\buffer.c;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\buffer.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\kiero\minhook\src\hde\hde32.c;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\hde32.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\kiero\minhook\src\hde\hde64.c;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\hde64.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\kiero\minhook\src\hook.c;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\hook.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\kiero\minhook\src\trampoline.c;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\trampoline.obj
+C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\utils.hpp;C:\Users\Administrator\Desktop\Apex_Private_Internal\Apex_Private_Internal\x64\Release\utils.obj
