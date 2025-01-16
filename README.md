@@ -10,4 +10,6 @@
 
 		return visible_time > 0.0f && fabsf(visible_time - cur_time) < 0.1f;
 	}
+
+ 
 	auto is_visible = isVisable();
