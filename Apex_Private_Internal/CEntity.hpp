@@ -31,7 +31,7 @@ public:
 			uint64_t Address = ((uint64_t)this);
 			if (!Address) return "";
 
-			for (int i = 0; i < 250; i++)
+			for (int i = 0; i < 10000; i++)
 			{
 				std::uintptr_t Entity = (*reinterpret_cast<std::uintptr_t*>(((uintptr_t)GetModuleHandleA(NULL) + OffsetsT1::Entity + (i << 5))));
 
@@ -190,7 +190,7 @@ public:
 		uint64_t Address = ((uint64_t)this);
 		if (!Address) return "";
 
-		for (int i = 0; i < 250; i++)
+		for (int i = 0; i < 10000; i++)
 		{
 			std::uintptr_t Entity = (*reinterpret_cast<std::uintptr_t*>(((uintptr_t)GetModuleHandleA(NULL) + OffsetsT1::Entity + (i << 5))));
 

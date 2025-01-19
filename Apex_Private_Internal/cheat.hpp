@@ -20,8 +20,10 @@
 #define LOG std::cout << "[DEBUG] " << 
 ID3D11ShaderResourceView* Homer_Texture = nullptr;
 ID3D11ShaderResourceView* Peter_Texture = nullptr;
-
+extern uintptr_t GameBase;
 int HightlightID = 1;
+float VisColor[4] = { 255,255,255,255 };
+bool visCheck = false;
  bool Box = false;
  bool CornerBox = false;
  bool ThreeBox = false;
@@ -76,19 +78,17 @@ bool Rcs = false;
 bool SpinBot = false;
 bool Draw_Menu = false;
 bool NewMenu = false;
-bool vis;
-bool visCheck = false;
-float VisColor[4] = { 255,255,255,255 };
 float BoxColor[4] = { 255,255,255,255 };
 float DistanceColor[3] = { 255,255,255 };
 float LineColor[3] = { 255,255,255 };
 float TargetLineColor[3] = { 255,255,255 };
-
+bool AimbotVis = false;
+bool vis;
 float OperatorColor[3] = { 255,255,255 };
 float LevelColor[3] = { 255,255,255 };
 float NameColor[3] = { 255,255,255 };
 bool VectorAim = true;
-int AimbotKey = VK_LBUTTON;
+int AimbotKey = VK_RBUTTON;
 bool OFFIndicator = false;
 bool FovCircle;
 bool TargetLine = false;
@@ -99,22 +99,6 @@ std::uintptr_t LocalPlayer;
 std::uintptr_t cl_entitylist;
 uintptr_t render;
 uintptr_t Matrixa;
-
-template<typename T = uintptr_t, typename A>
-T& read(A address) {
-	auto addresss = (DWORD64)address;
-	if (addresss > 0x40000 && (addresss + sizeof(T)) < 0x7FFFFFFF0000)
-		return *(T*)addresss;
-
-	auto n = nullptr;
-	return reinterpret_cast<T&>(n);
-}
-
-template <typename T>
-void write(uintptr_t address, T data) {
-	if (address > 0x40000 && (address + sizeof(T)) < 0x7FFFFFFF0000)
-		*(T*)(address) = data;
-}
 
 void W2S(Vector3 Position, Vector3& Screen, BaseMatrix Matrix)
 {
@@ -141,41 +125,40 @@ namespace Offsets {
 	DWORD Entity = 0x1FF4D88; //cl_entitylist0x0216f7b0 
 	DWORD LocalPlayer = 0x24CC258;
 	DWORD ViewRender = 0x77BA3B0;
-	DWORD viewAngles = 0x25B4 - 0x14;
+	DWORD viewAngles = 0x25b4 - 0x14;
 	DWORD in_duck = 0x77BA6C0;
 	DWORD PunchAngle = 0x24B8;
-	DWORD OFF_GLOW_ENABLE = 0x27c;                       //Script_Highlight_GetCurrentContext
+	DWORD lastVisableTime = 0x1a10; //m_hudInfo_visibilityTestAlwaysPasses + 0x3
+	DWORD OFF_GLOW_ENABLE = 0x28c;                       //Script_Highlight_GetCurrentContext
 	DWORD OFF_GLOW_THROUGH_WALL = 0x26c;                 //Script_Highlight_SetVisibilityType
 	DWORD OFF_GLOW_FIX = 0x270;
-	DWORD OFF_GLOW_HIGHLIGHT_ID = 0x29C;                 //[DT_HighlightSettings].m_highlightServerActiveStates    
-	DWORD OFF_GLOW_HIGHLIGHTS = 0xB2334C0;      //HighlightSettings
+	DWORD OFF_GLOW_HIGHLIGHT_ID = 0x298;                 //[DT_HighlightSettings].m_highlightServerActiveStates    
+	DWORD OFF_GLOW_HIGHLIGHTS = 0xB2330C0;      //HighlightSettings
 
-	DWORD showfps_enabled = 0x01983b00 + 0x6c;
+	DWORD showfps_enabled = 0x01983b00;
 	DWORD Bones = 0xDA8 + 0x48;
 	DWORD m_grapple = 0x2d28;
 	DWORD shadow_enable = 0x017f1b30;
-	DWORD CPlayer_camera_origin = 0x1F60;
-	DWORD ViewModule = 0x2E00;
+	DWORD CPlayer_camera_origin = 0x1f60;
+	DWORD ViewModule = 0x2e00;
 	DWORD IN_JUMP = 0x77BA5D8;
 	DWORD TimeBase = 0x2108;
 	DWORD m_traversalProgress = 0x2BE4;
 	DWORD m_traversalStartTime = 0x2BE8;
 	DWORD ss_viewmodelfov = 0x0237fd70;
-	DWORD m_iObserverMode = 0x3534;
+	DWORD m_iObserverMode = 0x34a4;//idk
 	DWORD m_xp = 0x382c;
 	DWORD m_iSignifierName = 0x0478;
 	DWORD m_ModelName = 0x0030;
-	DWORD NameList = 0xD48E9E0;
+	DWORD NameList = 0xd48e5e0;
 	DWORD ViewMatrix = 0x11a350;
 	DWORD M_VecAbsOrigin = 0x017c;
-	DWORD m_localOrigin = 0x0054;
-	DWORD m_localAngles = 0x0388;
 	DWORD m_Health = 0x0328;
 	DWORD m_Shield = 0x01a0;
 	DWORD m_MaxShield = 0x01a4;
-	DWORD m_Shield_type = 0x16d8;
-	DWORD m_lastUCmdSimulationTicks = 0x1c54;
-	DWORD m_lastUCmdSimulationRemainderTime = 0x1c58;
+	DWORD m_Shield_type = 0x47cc;
+	DWORD m_lastUCmdSimulationTicks = 0x1c54;//idk
+	DWORD m_lastUCmdSimulationRemainderTime = 0x1c58;//idk
 }
 void DrawRotatedImageWithBox(ImTextureID textureID, float x, float y, float width, float height)
 {
@@ -206,23 +189,10 @@ void DrawRotatedImageWithBox(ImTextureID textureID, float x, float y, float widt
 	ImGui::GetBackgroundDrawList()->AddImage(textureID, rotatedTopLeft, rotatedBottomRight);
 }
 
-template<typename T = uintptr_t, typename A>
-T ReadMem(A address) {
-	auto addresss = *reinterpret_cast<uintptr_t*>(address);
-	constexpr uintptr_t min_address = 0x40000;
-	constexpr uintptr_t max_address = 0x7FFFFFFF0000;
-
-	if (addresss >= min_address && (addresss + sizeof(T)) < max_address) {
-		return *reinterpret_cast<T*>(address);
-	}
-	else {
-		throw std::runtime_error("Invalid memory address or out of bounds.");
-	}
-}
 float GlowColor[3];
 inline std::string getName(uintptr_t address)
 {
-	for (int i = 0; i < 250; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		std::uintptr_t Entity = (*reinterpret_cast<std::uintptr_t*>(((uintptr_t)GetModuleHandleA(NULL) + Offsets::Entity + (i << 5))));
 
@@ -279,11 +249,11 @@ inline int GetPlayerLevel(uintptr_t address)
 	return level + ((m_xp - levels[arraySize - 1] + 1) / 18000);
 }
 
-bool isVisable(uintptr_t Address)
+bool isVisable(uintptr_t address)
 {
-	float cur_time = *reinterpret_cast<std::uintptr_t*>((uintptr_t)GetModuleHandleA(NULL) + 0x18BE180 + 0x10); //Global_vars
+	float cur_time = read<float>(GameBase + 0x18BE180 + 0x10); //Global_vars
 
-	float visible_time = read<float>(Address + 0x1A10);
+	float visible_time = read<float>(address + Offsets::lastVisableTime);
 
 	return visible_time > 0.0f && fabsf(visible_time - cur_time) < 0.1f;
 }
@@ -572,12 +542,17 @@ inline Vector3 getBonePos(int id, uintptr_t Address)
 	bone.z = bo.z + pos.z;
 	return bone;
 }
+
 std::uintptr_t Aimbot_Target(BaseMatrix M)
 {
 	std::uintptr_t BestEntity = NULL;
 	float Size = 999999.0f;
-	for (auto I = 0; I <= 250; I++)
+	for (auto I = 0; I <= 10000; I++)
 	{
+
+		auto is_visible = isVisable(I);
+		if (AimbotVis && !is_visible) continue;
+
 		std::uintptr_t LocalPlayer = (*reinterpret_cast<std::uintptr_t*>((uintptr_t)GetModuleHandleA(NULL) + Offsets::LocalPlayer));
 		if (!LocalPlayer) return BestEntity;
 
@@ -625,34 +600,41 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 	 IsFiringRange = Name == "mp_rr_canyonlands_staging_mu1";
  }*/
  void aimbot(uintptr_t ents, uintptr_t localPlayer, BaseMatrix M) {
+	 if (GetAsyncKeyState(AimbotKey))
+	 {
+		 if (localPlayer != NULL) {
+			 uintptr_t ent = Aimbot_Target(M);
+			 if (ent != NULL) {
 
-	 if (localPlayer != NULL) {
-		 uintptr_t ent = Aimbot_Target(M);
-		 if (ent != NULL) {
-			 Vector3 newAngle = CalcAngle(getBonePositionByHitbox(0, LocalPlayer), getBonePositionByHitbox(0, ent));
-			 if (newAngle.Empty()) return;
-			 if (newAngle.x != 0 && newAngle.y != 0)
-			 {
-				 Vector3 ViewAngle = *reinterpret_cast<Vector3*>(LocalPlayer + Offsets::viewAngles);
-				 Vector3 delta = newAngle - ViewAngle;
+				 Vector3 newAngle = CalcAngle(getBonePositionByHitbox(0, LocalPlayer), getBonePositionByHitbox(0, ent));
+				 Vector3 tPos = getBonePositionByHitbox(0, ent).ProjectWorldToScreen();
 
-				 delta.Normalize();
-				 float newSmoothing = smothing;
-				 if (smothing == 1)
+				 //if (newAngle.Empty()) return;
+				 if (tPos.Empty()) return;
+				 if (newAngle.x != 0 && newAngle.y != 0)
 				 {
-					 newSmoothing = 1.0f;
-				 }
-				 else {
-					 newSmoothing *= 18;
-				 }
+					 Vector3 ViewAngle = *reinterpret_cast<Vector3*>(LocalPlayer + Offsets::viewAngles);
+					 Vector3 delta = newAngle - ViewAngle;
 
-				 delta.y /= newSmoothing;
+					 delta.Normalize();
+					 float newSmoothing = smothing;
+					 if (smothing == 1)
+					 {
+						 newSmoothing = 1.0f;
+					 }
+					 else {
+						 newSmoothing *= 18;
+					 }
 
-				 *reinterpret_cast<Vector2*>(LocalPlayer + Offsets::viewAngles) = Vector2(newAngle.x, newAngle.y);
+					 delta.y /= newSmoothing;
+
+					 *reinterpret_cast<Vector2*>(LocalPlayer + Offsets::viewAngles) = Vector2(newAngle.x, newAngle.y);
+				 }
 			 }
 		 }
 	 }
  }
+
  void noRecoil(uintptr_t localPlayer) {
 	 if (localPlayer != NULL) {
 		 Vector2 angles;
@@ -752,10 +734,6 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 
 			 float height = Bottomout.y - Topout.y;
 			 float width = height / 2.3;
-
-
-			 auto is_visible = isVisable(Entity);
-
 			 if (Peter_GreiffenEsp)
 			 {
 				 DrawRotatedImageWithBox(Peter_Texture, NewPosHomer.x, NewPosHomer.y, width, height);
@@ -774,14 +752,16 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 				 ImGui::GetBackgroundDrawList()->AddText(ImVec2(Topout.x - (Size.x / 2), Topout.y + 40), ImColor(LevelColor[0], LevelColor[1], LevelColor[2], 255.f), Text.c_str());
 
 			 }
+
+			 auto is_visible = isVisable(Entity);
 			 ImU32  colorVis;
+
 			 if (Box)
 			 {
-				 if (is_visible) 
+				 if (is_visible)
 					 colorVis = IM_COL32(0, 255, 0, 255);
 				 else
 					 colorVis = IM_COL32(255, 0, 0, 255);
-
 				 if (visCheck)
 					 vis ? DrawBox(ImVec2(Bottomout.x, Bottomout.y), ImVec2(Topout.x, Topout.y), colorVis, 0.7f) : DrawBox(ImVec2(Bottomout.x, Bottomout.y), ImVec2(Topout.x, Topout.y), ImColor(VisColor[0], VisColor[1], VisColor[2], VisColor[3]), 0.7f);
 				 else
@@ -982,7 +962,7 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 			 }
 			 if (Psilent)
 			 {
-				 if (GetAsyncKeyState(PsilentKey))
+				 if (GetAsyncKeyState(VK_RBUTTON))
 					 int Random = rand() % 10;
 				 {
 					 uintptr_t ent = Aimbot_Target(M);
@@ -1039,7 +1019,7 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 			 }
 
 		 }
-		 if (VectorAim && GetAsyncKeyState(AimbotKey))
+		 if (VectorAim)
 		 {
 			 aimbot(Entity, LocalPlayer, M);
 		 }
@@ -1082,7 +1062,7 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 		 }
 		 if (BigMapRadar)
 		 {
-			 int LocalPlayer_TeamID = (*reinterpret_cast<int*>(LocalPlayer + 0x0338)); //m_iTeamNum=0x0328
+			 int LocalPlayer_TeamID = (*reinterpret_cast<int*>(LocalPlayer + 0x0328)); //m_iTeamNum=0x0328
 			 if (LocalPlayer_TeamID != 1) {
 				 uintptr_t timeBase = Offsets::TimeBase;
 
@@ -1091,14 +1071,14 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 				 float endTime = curTime + continueTime;
 				 while (curTime < endTime)
 				 {
-					 *reinterpret_cast<int*>(Entity + 0x0338) = 1;
+					 *reinterpret_cast<int*>(Entity + 0x0328) = 1;
 					 curTime = *reinterpret_cast<float*>(Entity + timeBase);
 				 }
 				 curTime = *reinterpret_cast<float*>(Entity + timeBase);
 				 endTime = curTime + continueTime;
 				 while (curTime < endTime)
 				 {
-					 *reinterpret_cast<int*>(Entity + 0x0338) = LocalPlayer_TeamID;
+					 *reinterpret_cast<int*>(Entity + 0x0328) = LocalPlayer_TeamID;
 					 curTime = *reinterpret_cast<float*>(Entity + timeBase);
 				 }
 			 }
@@ -1106,10 +1086,10 @@ std::uintptr_t Aimbot_Target(BaseMatrix M)
 			 {
 				 int nowtime = GetTickCount();
 				 while (GetTickCount() - nowtime < 200) {
-					 *reinterpret_cast<int*>(Entity + 0x0338, i);
+					 *reinterpret_cast<int*>(Entity + 0x0328, i);
 				 }
 			 }
-			 *reinterpret_cast<int*>(Entity + 0x0338) = LocalPlayer_TeamID;
+			 *reinterpret_cast<int*>(Entity + 0x0328) = LocalPlayer_TeamID;
 		 }
 
 		 if (OFFIndicator)

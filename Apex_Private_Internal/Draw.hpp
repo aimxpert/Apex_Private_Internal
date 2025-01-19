@@ -35,9 +35,7 @@ void DrawCorneredBox(int X, int Y, int W, int H, const ImU32& color, int thickne
 	ImGui::GetBackgroundDrawList()->AddLine(ImVec2(X + W, Y + H - lineH), ImVec2(X + W, Y + H), ImGui::GetColorU32(color), thickness);
 }
 
-
-
-inline void DrawBox(ImVec2 headPos, ImVec2 pos, const ImU32 color, int thickness) {
+void DrawBox(ImVec2 headPos, ImVec2 pos, const ImU32 color, int thickness) {
 	int dist = pos.y - headPos.y;
 	ImGui::GetBackgroundDrawList()->AddLine(ImVec2(headPos.x - dist / 4, headPos.y), ImVec2(headPos.x + dist / 4, headPos.y), color, thickness);
 	ImGui::GetBackgroundDrawList()->AddLine(ImVec2(headPos.x + dist / 4, headPos.y), ImVec2(pos.x + dist / 4, pos.y), color, thickness);

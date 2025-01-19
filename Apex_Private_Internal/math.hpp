@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <math.h>
 #include "imgui/imgui.h"
+#include "memory.hpp"
 #include "offsets.h"
 struct BaseMatrix
 {
@@ -254,6 +255,32 @@ public:
 	}
 
 	inline Vector3 operator*(float flNum) { return Vector3(x * flNum, y * flNum, z * flNum); }
+
+	inline Vector3 ProjectWorldToScreen() {
+
+		uintptr_t render = read<uintptr_t>((uintptr_t)(GetModuleHandle("r5apex.exe")) + OffsetsT1::ViewRender);
+		uintptr_t Matrixa = read<uintptr_t>(OffsetsT1::ViewMatrix + render);
+
+		BaseMatrix M = read<BaseMatrix>(Matrixa);
+		struct Vector3 out;
+		float _x = M.at[0] * this->x + M.at[1] * this->y + M.at[2] * this->z + M.at[3];
+		float _y = M.at[4] * this->x + M.at[5] * this->y + M.at[6] * this->z + M.at[7];
+		out.z = M.at[12] * this->x + M.at[13] * this->y + M.at[14] * this->z + M.at[15];
+
+		if (out.z < 0.1f)
+			return { 0, 0,0 };
+
+		_x *= 1.f / out.z;
+		_y *= 1.f / out.z;
+
+		out.x = ImGui::GetIO().DisplaySize.x * .5f;
+		out.y = ImGui::GetIO().DisplaySize.y * .5f;
+
+		out.x += 0.5f * _x * ImGui::GetIO().DisplaySize.x + 0.5f;
+		out.y -= 0.5f * _y * ImGui::GetIO().DisplaySize.y + 0.5f;
+
+		return out;
+	}
 
 };
 class Vector2

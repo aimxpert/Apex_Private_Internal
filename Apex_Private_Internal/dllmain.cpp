@@ -53,19 +53,22 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	return TRUE;
 }
 
-//void functionref(entity projectile, vector3 pos, entity hitEnt, int hitbox, bool passthrough)
-void DoHooks()
-{
-	auto PSilent_Function = *reinterpret_cast<std::uintptr_t*>((uintptr_t)GetModuleHandleA(NULL) + 0x74A3708);
-}
-bool InitCheat = false;
+uintptr_t GameBase;
 
 BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 {
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		CreateThread(nullptr, 0, MainThread, lpReserved, 0, nullptr);
+		if (GameBase = (uintptr_t)(GetModuleHandleA)(("r5apex.exe")))
+		{
+			DisableThreadLibraryCalls(hMod);
+			CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+		}
+		else {
+			kiero::shutdown();
+			exit(0);
+		}
 		break;
 	case DLL_PROCESS_DETACH:
 		kiero::shutdown();

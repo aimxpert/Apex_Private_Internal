@@ -1008,6 +1008,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	{
 		InitPlayer();
 	}
+	//draw_text_outline_font(120, 10, ImColor(255, 155, 0, 255), "{DEV BUILD}");
+	//ImGui::GetBackgroundDrawList()->AddText(ImVec2(40, 20), ImColor(255, 0, 255, 255), "SCORE");
+	//ImGui::GetBackgroundDrawList()->AddText(ImVec2(40, 35), ImColor(255, 0, 0, 255), "Pasted Cheat : 1");
+	//ImGui::GetBackgroundDrawList()->AddText(ImVec2(40, 50), ImColor(255, 0, 0, 255), "Eac : 0");
 
 	ImGui::Render();
 
